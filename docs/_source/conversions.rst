@@ -1,5 +1,5 @@
-Processing
-==========
+Conversions
+===========
 
 .. automodule:: windeval.processing
    :members:

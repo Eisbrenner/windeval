@@ -38,10 +38,10 @@ Planned logic:
    :maxdepth: 2
    :caption: Modules
 
-   _source/importer
-   _source/wrapper
-   _source/processing
-   _source/analysis
+   _source/io
+   _source/conversions
+   _source/diagnostics
+   _source/reports
 
 .. toctree::
    :maxdepth: 2

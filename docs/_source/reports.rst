@@ -1,7 +1,7 @@
-Wrapper
+Reports
 =======
 
-.. automodule:: windeval.wrapper
+.. automodule:: windeval.io.reports
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,5 +1,7 @@
 import os
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -54,3 +56,8 @@ def X():
         },
     )
     return ds
+
+
+@pytest.fixture
+def path_to_test_data():
+    return Path(__file__).resolve().parent.joinpath("test_data")

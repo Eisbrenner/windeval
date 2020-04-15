@@ -1,22 +1,72 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional, Union
 
 import xarray as xr
 
 
-def open_product(
-    path0: str,
-    path1: str,
-    *args: Any,
+def open_products(
+    ds1: Dict[str, Union[str, Path]],
+    ds2: Dict[str, Union[str, Path]],
+    *xarray_args: List[Any],
+    path: Optional[Union[str, Path]] = None,
     experimental: bool = False,
-    **kwargs: Dict[str, Any]
+    **xarray_kwargs: Dict[str, Any],
 ) -> Dict[str, xr.Dataset]:
-    if not args:
-        names = [Path(path0).stem, Path(path1).stem]
-    else:
-        names = [*args]
+    """Open Dataset
+
+    Parameters
+    ----------
+    ds1 : dict
+        | Dictionary of parameters for first dataset;
+        | parameters are:
+        |   name : str, optional
+        |   file : str, optional
+        |   path : str or path_like, optional
+    ds2 : dict
+        | Dictionary of parameters for second dataset;
+        | parameters are:
+        |   name : str, optional
+        |   file : str, optional
+        |   path : str or path_like, optional
+    path : str or path_like, optional
+    xarray_args : list, optional
+    xarray_kwargs : dict, optional
+    experimental : bool, optional
+
+    Returns
+    -------
+    dict
+        Dictionary of both input datasets.
+
+    """
+    names: List[str] = []
+    for x in [ds1, ds2]:
+        if x.get("name", None) is not None:
+            names.append(str(x["name"]))
+        elif x.get("file", None) is not None:
+            names.append(Path(x["file"]).stem)
+        elif x.get("path", None) is not None:
+            names.append(Path(x["path"]).stem)
+        else:
+            raise ValueError("Unique name, file or path not provided.")
+    paths: List[Path] = []
+    for i, x in enumerate([ds1, ds2]):
+        if x.get("path", None) is not None:
+            paths.append(Path(x["path"]))
+        elif path is not None:
+            paths.append(Path(path))
+        else:
+            raise ValueError("Paths not provided.")
+        if x.get("file", None) is not None:
+            paths[i] = Path(paths[i]).joinpath(x["file"])
+    for p in paths:
+        if not p.exists():
+            raise ValueError("File does not exist {}".format(p))
     if experimental:
-        ds = {names[0]: xr.open_dataset(path0), names[1]: xr.open_dataset(path1)}
+        ds: Dict[str, xr.Dataset] = {
+            n: xr.open_dataset(paths[i], *xarray_args, **xarray_kwargs)
+            for i, n in enumerate(names)
+        }
     else:
         raise NotImplementedError(
             "Import of data through Intake is not yet implemented."
@@ -25,11 +75,13 @@ def open_product(
     return ds
 
 
-def save_product(
+def save_products(
     ds: Dict[str, xr.Dataset],
-    path: str,
+    ds1: Dict[str, Any],
+    ds2: Dict[str, Any],
+    path: Union[str, Path],
     experimental: bool = False,
-    **kwargs: Dict[str, Any]
+    **kwargs: Dict[str, Any],
 ) -> None:
     if experimental:
         for k, v in ds.items():
