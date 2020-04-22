@@ -1,22 +1,6 @@
-from . import plotting, processing
-from .io import api as io
-from .io.api import info, open_products, report, save_products, select
-from .plotting import plot
-from .processing import conversions, diagnostics
+from .__version__ import __version__  # noqa
+from .api import conversions, diagnostics, extract
+from .io.api import export, load_product, report
 
 
-__all__ = [
-    # modules
-    "io",
-    "processing",
-    "plotting",
-    # core functions
-    "open_products",
-    "save_products",
-    "info",
-    "select",
-    "conversions",
-    "diagnostics",
-    "plot",
-    "report",
-]
+__all__ = ["load_product", "extract", "conversions", "diagnostics", "report", "export"]

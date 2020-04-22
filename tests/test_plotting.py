@@ -1,6 +1,8 @@
 import pytest
 
-from windeval import plotting, processing
+import windeval.plotting as plotting
+
+from windeval import diagnostics
 
 
 def test_plot(X):
@@ -9,5 +11,8 @@ def test_plot(X):
         plotting.plot(False)
     with pytest.raises(NotImplementedError):
         plotting.plot({"ds": X}, "eastward_wind", dataset=[])
-    ds = processing.diagnostics({"ds": X}, "eastward_wind", "welch")
-    plotting.plot(ds, "power_spectral_density")
+
+    wnd = dict(ds1=X, ds2=X)
+    wnd = diagnostics(wnd, spectra=dict(variables="eastward_wind", method="welch"))
+
+    plotting.plot(wnd, "eastward_wind_power_spectral_density")

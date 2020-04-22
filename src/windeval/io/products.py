@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 import xarray as xr
 
 
-def open_products(
+def load_product(
     ds1: Dict[str, Union[str, Path]],
     ds2: Dict[str, Union[str, Path]],
     *xarray_args: List[Any],
@@ -75,7 +75,7 @@ def open_products(
     return ds
 
 
-def save_products(
+def export(
     ds: Dict[str, xr.Dataset],
     ds1: Dict[str, Any],
     ds2: Dict[str, Any],
@@ -96,7 +96,7 @@ def info(wndpr: Dict[str, xr.Dataset], *args: Any, **kwargs: Dict[str, Any]) -> 
     raise NotImplementedError("Info of wind products is not yet implemented.")
 
 
-def select(
+def extract(
     wndpr: Dict[str, xr.Dataset], *args: Any, **kwargs: Dict[str, Any]
 ) -> Dict[str, xr.Dataset]:
     raise NotImplementedError(

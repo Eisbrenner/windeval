@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from windeval import processing
+import windeval.processing as processing
 
 
 @pytest.fixture
@@ -184,13 +184,3 @@ def test_sverdrup_transport(X):
         X.sverdrup_transport[0, 0, 0, 0].values, -62.40566775, rel_tol=1e-7
     )
     assert np.isnan(X.data_vars["sverdrup_transport"].values[0, 0, 0, 1])
-
-
-def test_conversions(X):
-    with pytest.raises(NotImplementedError):
-        processing.conversions({"ds": X})
-
-
-def test_diagnostics(X):
-    ds = processing.diagnostics({"ds": X}, "eastward_wind", "welch")
-    assert isinstance(ds["ds"]["power_spectral_density"], xr.DataArray)

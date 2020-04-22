@@ -2,8 +2,7 @@
 Preprocessing module.
 """
 
-from functools import singledispatch
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import xarray as xr
@@ -607,74 +606,87 @@ def sverdrup_transport(X: xr.Dataset) -> xr.Dataset:
     return X
 
 
-class Conversions:
-    def __init__(self):
-        raise NotImplementedError("Conversions are not yet implemented.")
-
-
-@singledispatch
-def conversions(*args, **kwargs):
-    raise NotImplementedError("Data type not supported for conversion.")
-
-
 class Diagnostics:
+    """Container class for diagnostic calculations.
+
+    Attributes
+    ----------
+    spectra
+
+    """
+
     @staticmethod
-    def welch(da: xr.DataArray, *args: Any, **kwargs: Dict[str, Any]) -> xr.Dataset:
-        f, psd = signal.welch(da.values.flat, *args, **kwargs)
-        ds = xr.Dataset(
-            {"power_spectral_density": ("frequency", psd)},
-            coords={"frequency": (["frequency"], f)},
-        )
+    def spectra(
+        wnd: Dict[str, xr.Dataset],
+        variable: str,
+        product: Optional[str] = None,
+        method_args: Optional[List[Any]] = None,
+        method_kwargs: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, xr.Dataset]:
+        """Selected methods from the `scipy.signal` module.
 
-        return ds
-
-
-@singledispatch
-def diagnostics(*args, **kwargs):
-    raise NotImplementedError("Data type not supported.")
-
-
-@diagnostics.register
-def _(da: xr.DataArray, diag: str, *args: Any, **kwargs: Dict[str, Any]) -> xr.Dataset:
-    if getattr(Diagnostics, diag, None) is not None:
-        y = getattr(Diagnostics, diag)(da, *args, **kwargs)
-    elif getattr(da, diag, None) is not None:
-        y = getattr(da, diag)(*args, **kwargs)
-    else:
-        raise ValueError("Unknown diagnostic.")
-
-    return y
+        Currently Supported
+            | periodogram : Estimate power spectral density using a periodogram.
+            | welch : Estimate power spectral density using Welch’s method.
 
 
-@diagnostics.register  # type: ignore
-def _(
-    ds: xr.Dataset, var: str, diag: str, *args: Any, **kwargs: Dict[str, Any]
-) -> xr.Dataset:
-    ds = ds.merge(diagnostics(ds[var], diag, *args, **kwargs))
+        Parameters
+        ----------
+        wnd : dict
+        variable : str
+        product : str, optional
+        method_args : list, optional
+        method_kwargs : dict, optional
 
-    return ds
+        Returns
+        -------
+        dict
+            Adds frequecy as dimension and power spectral density as data variable.
+
+        """
+        supported_methods = ["periodogram", "welch"]
+
+        # replace parameters with defaults if required
+        products = [product] if product is not None else list(wnd.keys())
+        margs = method_args if method_args is not None else list([])
+        mkwargs = method_kwargs if method_kwargs is not None else dict(method="welch")
+
+        method = mkwargs.pop("method", None)
+        if method not in supported_methods:
+            raise ValueError("{} method not supported.".format(method))
+
+        nan_handling = mkwargs.pop("nan_handling", None)
+        data: Dict[str, np.ndarray] = {}
+        if nan_handling in ["remove", None]:
+            for pname in wnd.keys():
+                data[pname] = np.array(
+                    list(
+                        filter(
+                            lambda v: v == v, wnd[pname].data_vars[variable].values.flat
+                        )
+                    )
+                )
+        else:
+            raise NotImplementedError(
+                "Unknown NaN hanlding method: {}.".format(nan_handling)
+            )
+
+        for pname in products:
+            f, psd = getattr(signal, method)(data[pname], *margs, **mkwargs)
+            ds = xr.Dataset(
+                {variable + "_power_spectral_density": (variable + "_frequency", psd)},
+                coords={variable + "_frequency": ([variable + "_frequency"], f)},
+            )
+            wnd[pname] = wnd[pname].merge(ds)
+
+        return wnd
 
 
-@diagnostics.register  # type: ignore
-def _(
-    wnddict: dict,
-    var: str,
-    diag: str,
-    *args: Any,
-    dataset: Optional[Iterable] = None,
-    **kwargs: Dict[str, Any]
-) -> Dict[str, xr.Dataset]:
+class Conversions:
+    """Container class for conversion calculations.
 
-    if dataset is None:
-        dataset = wnddict.keys()
-    else:
-        raise NotImplementedError(
-            "Specifing a dataset for diagnostics is not implemented yet."
-        )
+    Attributes
+    ----------
+    not implemented
 
-    for wndkey in dataset:
-        wnddict[wndkey] = wnddict[wndkey].merge(
-            diagnostics(wnddict[wndkey][var], diag, *args, **kwargs)
-        )
-
-    return wnddict
+    """
