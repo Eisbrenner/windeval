@@ -64,7 +64,7 @@ def load_product(
             raise ValueError("File does not exist {}".format(p))
     if experimental:
         ds: Dict[str, xr.Dataset] = {
-            n: xr.open_dataset(paths[i], *xarray_args, **xarray_kwargs)
+            n: xr.open_dataset(str(paths[i]), *xarray_args, **xarray_kwargs)
             for i, n in enumerate(names)
         }
     else:
