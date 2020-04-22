@@ -1,5 +1,4 @@
 import pytest
-
 import windeval.plotting as plotting
 
 from windeval import diagnostics

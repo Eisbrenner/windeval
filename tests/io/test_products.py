@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 import windeval.io.products as products
 
 
