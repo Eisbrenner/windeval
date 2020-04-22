@@ -28,6 +28,10 @@ def test_export(path_to_test_data):
     ds = [dict(name=i, file="station_" + i + ".cdf") for i in "12"]
     for xi in ds:
         assert Path(path_to_test_data.joinpath(xi["file"])).exists()
+        print("-" * 100)
+        print(Path(path_to_test_data.joinpath(xi["file"])).exists())
+        print("-" * 100)
+
     products.export(
         products.load_product(*ds, path=path_to_test_data, experimental=True),
         dict(),
