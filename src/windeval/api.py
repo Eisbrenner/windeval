@@ -8,10 +8,12 @@ from .processing import Diagnostics
 
 
 def extract(*args, **kwargs):
+    """To be implemented."""
     raise NotImplementedError("Method not implemented: extract.")
 
 
 def conversions(*args, **kwargs):
+    """To be implemented."""
     raise NotImplementedError("Method not implemented: conversions.")
 
 
