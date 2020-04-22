@@ -36,12 +36,9 @@ Planned logic:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Modules
+   :caption: User Interface
 
-   _source/io
-   _source/conversions
-   _source/diagnostics
-   _source/reports
+   _source/user_interface
 
 .. toctree::
    :maxdepth: 2

@@ -82,6 +82,7 @@ def export(
     experimental: bool = False,
     **kwargs: Dict[str, Any],
 ) -> None:
+    """To be implemented."""
     if experimental:
         for k, v in ds.items():
             v.to_netcdf(Path(path).joinpath(k + ".cdf"))
@@ -92,12 +93,14 @@ def export(
 
 
 def info(wndpr: Dict[str, xr.Dataset], *args: Any, **kwargs: Dict[str, Any]) -> None:
+    """To be implemented."""
     raise NotImplementedError("Info of wind products is not yet implemented.")
 
 
 def extract(
     wndpr: Dict[str, xr.Dataset], *args: Any, **kwargs: Dict[str, Any]
 ) -> Dict[str, xr.Dataset]:
+    """To be implemented."""
     raise NotImplementedError(
         "Selecting and slicing of dataset is not yet implemented."
     )
