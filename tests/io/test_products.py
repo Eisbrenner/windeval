@@ -26,8 +26,8 @@ def test_load_product(path_to_test_data):
 
 def test_export(path_to_test_data):
     ds = [dict(name=i, file="station_" + i + ".cdf") for i in "12"]
-    for file in ds.values():
-        assert Path(path_to_test_data.joinpath(file)).exists()
+    for xi in ds:
+        assert Path(path_to_test_data.joinpath(xi["file"])).exists()
     products.export(
         products.load_product(*ds, path=path_to_test_data, experimental=True),
         dict(),
