@@ -1,5 +1,8 @@
+from pathlib import Path
+
 import pytest
-import windeval.io.products as products
+
+from windeval import products
 
 
 def test_load_product(path_to_test_data):
@@ -22,21 +25,21 @@ def test_load_product(path_to_test_data):
         products.load_product(ds1, ds2, path=path_to_test_data)
 
 
-# def test_export(path_to_test_data):
-#     ds = [dict(name=i, file="station_" + i + ".cdf") for i in "12"]
-#     products.export(
-#         products.load_product(*ds, path=path_to_test_data, experimental=True),
-#         dict(),
-#         dict(),
-#         Path.cwd(),
-#         experimental=True,
-#     )
-#     for i in "12":
-#         assert Path.cwd().joinpath(i + ".cdf").exists()
-#         Path.cwd().joinpath(i + ".cdf").unlink()
-#         assert not Path.cwd().joinpath(i + ".cdf").exists()
-#     with pytest.raises(NotImplementedError):
-#         products.export(dict(), dict(), dict(), str())
+def test_export(path_to_test_data):
+    ds = [dict(name=i, file="station_" + i + ".cdf") for i in "12"]
+    products.export(
+        products.load_product(*ds, path=path_to_test_data, experimental=True),
+        dict(),
+        dict(),
+        Path.cwd(),
+        experimental=True,
+    )
+    for i in "12":
+        assert Path.cwd().joinpath(i + ".cdf").exists()
+        Path.cwd().joinpath(i + ".cdf").unlink()
+        assert not Path.cwd().joinpath(i + ".cdf").exists()
+    with pytest.raises(NotImplementedError):
+        products.export(dict(), dict(), dict(), str())
 
 
 def test_info(X):
