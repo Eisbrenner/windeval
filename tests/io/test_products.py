@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import pytest
-import windeval.io.products as products
+
+from windeval import products
 
 
 def test_load_product(path_to_test_data):

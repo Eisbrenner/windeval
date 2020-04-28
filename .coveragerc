@@ -1,0 +1,12 @@
+[run]
+omit =
+    src/windeval/app.py
+    tests/*
+data_file = .cov/.coverage
+
+[report]
+sort = Miss
+fail_under = 90
+
+[xml]
+output = .cov/coverage.xml

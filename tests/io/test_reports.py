@@ -1,5 +1,6 @@
 import pytest
-import windeval.io.reports as reports
+
+from windeval import reports
 
 
 def test_report(X):

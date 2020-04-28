@@ -3,6 +3,9 @@ name = "windeval"
 version = "0.1.0"
 description = ""
 authors = ["windeval developers <windeval@googlegroups.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/windeval/windeval"
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -33,3 +36,38 @@ ipdb = "^0.13.2"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.isort]
+line_length = 88
+force_single_line = false
+atomic = true
+include_trailing_comma = true
+lines_after_imports = 2
+lines_between_types = 1
+multi_line_output = 3
+use_parentheses = true
+not_skip = "__init__.py"
+skip_glob = ["*/setup.py"]
+filter_files = true
+
+known_first_party = "windeval"
+known_third_party = ["matplotlib", "numpy", "pytest", "scipy", "streamlit", "windeval", "xarray"]
+
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | tests/.*/setup.py
+)/
+'''
