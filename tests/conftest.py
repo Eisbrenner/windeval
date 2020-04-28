@@ -60,4 +60,5 @@ def X():
 
 @pytest.fixture
 def path_to_test_data():
-    return Path(__file__).resolve().parent.joinpath("test_data")
+    path = Path(__file__).resolve().parent.joinpath("test_data")
+    return os.path.normpath(path)
