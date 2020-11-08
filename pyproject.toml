@@ -7,6 +7,9 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/windeval/windeval"
 
+[tool.poetry.scripts]
+windeval = "windeval.app:main"
+
 [tool.poetry.dependencies]
 python = "^3.7"
 scipy = "^1.4.1"
