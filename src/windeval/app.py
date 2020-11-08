@@ -1,76 +1,58 @@
 import inspect
 
-from pathlib import Path
-
+import intake
 import matplotlib.pyplot as plt
 import streamlit as st
+import windeval_catalog
 
-from windeval import diagnostics, load_product
+from windeval import diagnostics
 from windeval.processing import Diagnostics
 
 
 st.sidebar.markdown("# Load data")
-path1 = st.sidebar.text_input("Please enter path to the first data set.")
-path2 = st.sidebar.text_input("Please enter path to the second data set.")
-paths = [path1, path2]
-
+catalog_path = st.sidebar.text_input("Please enter path to the intake data-catalog.")
 st.write("# Loaded data sets")
-fmap = {0: "First", 1: "Second"}
-wait = [True, True]
-for i in range(2):
-    if not Path(paths[i]).exists() or not paths[i]:
-        paths[i] = (
-            Path(__file__)
-            .resolve()
-            .parent.parent.parent.joinpath(
-                "tests/test_data/station_{}.cdf".format(i + 1)
-            )
-        )
-        if Path(paths[i]).exists():
-            st.write(
-                "WARNING: {} file does not exist or none given. Using test path:\n\n".format(
-                    fmap[i]
-                ),
-                paths[i],
-            )
-    if Path(paths[i]).exists():
-        wait[i] = False
-    else:
-        st.write("WARNING: {} file does not exist or none given.".format(fmap[i]))
+if not catalog_path:
+    st.markdown("Using default (test) data catalog.")
+    cat = windeval_catalog.get_catalog()
+else:
+    cat = intake.open_catalog(catalog_path)
+sel = st.sidebar.multiselect("Select data", list(cat))
 
-if not any(wait):
-    wnd = load_product(*[{"path": p} for p in paths], experimental=True)
-    st.write("Opened wind products:", wnd)
 
-    st.sidebar.markdown("# Select slice")
-    st.write("# Selected slices")
+wnd = {key: windeval_catalog.enforce_standard_names(cat[key].read()) for key in sel}
 
-    st.sidebar.markdown("# Select diagnostic method")
-    st.write("# Result")
+st.write("Opened wind products:", wnd)
 
-    variable = st.sidebar.selectbox(
-        "Select variable:", list(wnd[list(wnd.keys())[0]].data_vars)
-    )
-    diag = st.sidebar.selectbox(
-        "Select method:",
-        [
-            a[0]
-            for a in inspect.getmembers(Diagnostics)
-            if not (a[0].startswith("__") and a[0].endswith("__"))
-        ],
-    )
-    assert getattr(Diagnostics, diag) is not None
-    global_diag = {diag: {"variables": variable, "method": "welch", "nperseg": 26}}
+st.sidebar.markdown("# Select slice")
+st.write("# Selected slices")
 
-    calculate = st.button("Calculate")
-    if calculate:
-        diagnostics(wnd, **global_diag)
-        for k in wnd.keys():
-            plt.semilogx(wnd[k][variable + "_power_spectral_density"])
-        plt.legend(wnd.keys())
-        plt.title("PSD: power spectral density")
-        plt.xlabel("Frequency")
-        plt.ylabel("Power")
-        plt.tight_layout()
-        plt.grid()
-        st.pyplot()
+st.sidebar.markdown("# Select diagnostic method")
+st.write("# Result")
+
+variable = st.sidebar.selectbox(
+    "Select variable:", list(wnd[list(wnd.keys())[0]].data_vars)
+)
+diag = st.sidebar.selectbox(
+    "Select method:",
+    [
+        a[0]
+        for a in inspect.getmembers(Diagnostics)
+        if not (a[0].startswith("__") and a[0].endswith("__"))
+    ],
+)
+assert getattr(Diagnostics, diag) is not None
+global_diag = {diag: {"variables": variable, "method": "welch", "nperseg": 26}}
+
+calculate = st.button("Calculate")
+if calculate:
+    diagnostics(wnd, **global_diag)
+    for k in wnd.keys():
+        plt.semilogx(wnd[k][variable + "_power_spectral_density"])
+    plt.legend(wnd.keys())
+    plt.title("PSD: power spectral density")
+    plt.xlabel("Frequency")
+    plt.ylabel("Power")
+    plt.tight_layout()
+    plt.grid()
+    st.pyplot()
