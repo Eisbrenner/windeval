@@ -1,4 +1,7 @@
+import subprocess
+
 from functools import reduce
+from pathlib import Path
 from typing import Any, Callable, Dict, KeysView, Optional, Tuple
 
 import numpy as np
@@ -7,7 +10,15 @@ import xarray as xr
 from .processing import Conversions, Diagnostics
 
 
+def app() -> None:
+    subprocess.run(
+        ["streamlit", "run", Path(__file__).resolve().parent.joinpath("app.py")]
+    )
+    return None
+
+
 def extract(*args, **kwargs):
+    """To be implemented."""
     raise NotImplementedError("Method not implemented: extract.")
 
 

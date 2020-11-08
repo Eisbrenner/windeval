@@ -2,7 +2,7 @@ from windeval import __version__
 
 
 def test_version():
-    assert __version__ == "0.1.0"
+    assert __version__ == "2020.1"
 
 
 def test_all():

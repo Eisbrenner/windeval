@@ -3,8 +3,9 @@ import math
 
 import numpy as np
 import pytest
-import windeval.processing as processing
 import xarray as xr
+
+import windeval.processing as processing
 
 
 @pytest.fixture
