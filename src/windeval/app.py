@@ -1,49 +1,36 @@
 import inspect
 
-from pathlib import Path
-
+import intake
 import matplotlib.pyplot as plt
 import streamlit as st
+import windeval_catalog
 
-from windeval import diagnostics, load_product
+from windeval import diagnostics
 from windeval.processing import Diagnostics
 
 
 st.sidebar.markdown("# Load data")
-path1 = st.sidebar.text_input("Please enter path to the first data set.")
-path2 = st.sidebar.text_input("Please enter path to the second data set.")
-paths = [path1, path2]
-
+catalog_path = st.sidebar.text_input("Please enter path to the intake data-catalog.")
 st.write("# Loaded data sets")
-fmap = {0: "First", 1: "Second"}
-wait = [True, True]
-for i in range(2):
-    if not Path(paths[i]).exists() or not paths[i]:
-        paths[i] = (
-            Path(__file__)
-            .resolve()
-            .parent.parent.parent.joinpath(
-                "tests/test_data/station_{}.cdf".format(i + 1)
-            )
-        )
-        if Path(paths[i]).exists():
-            st.write(
-                "WARNING: {} file does not exist or none given. Using test path:\n\n".format(
-                    fmap[i]
-                ),
-                paths[i],
-            )
-    if Path(paths[i]).exists():
-        wait[i] = False
-    else:
-        st.write("WARNING: {} file does not exist or none given.".format(fmap[i]))
+if not catalog_path:
+    st.markdown("Using default (test) data catalog.")
+    cat = windeval_catalog.get_catalog()
+else:
+    cat = intake.open_catalog(catalog_path)
+sel = st.sidebar.multiselect("Select data", list(cat))
+if not sel:
+    st.markdown("#### Please select datasets from the catalog (sidebar).")
 
-if not any(wait):
-    wnd = load_product(*[{"path": p} for p in paths], experimental=True)
+if sel:
+    wnd = {key: windeval_catalog.enforce_standard_names(cat[key].read()) for key in sel}
+
     st.write("Opened wind products:", wnd)
 
     st.sidebar.markdown("# Select slice")
+    st.sidebar.markdown("Not yet implemented.")
+
     st.write("# Selected slices")
+    st.write("Not yet implemented.")
 
     st.sidebar.markdown("# Select diagnostic method")
     st.write("# Result")
@@ -62,7 +49,7 @@ if not any(wait):
     assert getattr(Diagnostics, diag) is not None
     global_diag = {diag: {"variables": variable, "method": "welch", "nperseg": 26}}
 
-    calculate = st.button("Calculate")
+    calculate = st.button("Calculate!")
     if calculate:
         diagnostics(wnd, **global_diag)
         for k in wnd.keys():

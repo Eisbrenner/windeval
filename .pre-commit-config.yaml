@@ -34,4 +34,4 @@ repos:
     rev: v0.770
     hooks:
       - id: mypy
-        exclude: "(^docs/conf.py)|(^src/windeval/app.py)"
+        exclude: "(^docs/conf.py)|(tests/*)|(^src/windeval/app.py)"
