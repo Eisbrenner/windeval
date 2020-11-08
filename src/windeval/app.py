@@ -12,7 +12,7 @@ from windeval.processing import Diagnostics
 st.sidebar.markdown("# Load data")
 catalog_path = st.sidebar.text_input("Please enter path to the intake data-catalog.")
 st.write("# Loaded data sets")
-if catalog_path:
+if not catalog_path:
     st.markdown("Using default (test) data catalog.")
     cat = windeval_catalog.get_catalog()
 else:
